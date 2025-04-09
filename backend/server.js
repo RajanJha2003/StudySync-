@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import connectDb from "./config/database.js";
+import userRouter from "./routes/user.js";
 
 dotenv.config();
 
@@ -10,9 +11,11 @@ const PORT = process.env.PORT || 5000;
 
 connectDb();
 
-// Default Route
+
+app.use("/api/v1/auth",userRouter)
+
 app.get('/', (req, res) => {
-    // console.log('Your server is up and running..!');
+    
     res.send(`<div>
     This is Default Route  
     <p>Everything is OK</p>
