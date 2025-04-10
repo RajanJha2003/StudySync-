@@ -1,3 +1,4 @@
+import otpTemplate from "../mail/emailVerification.js";
 import OTP from "../model/otp.js";
 import Profile from "../model/profile.js";
 import User from "../model/user.js";
