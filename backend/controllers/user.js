@@ -1,4 +1,5 @@
 import OTP from "../model/otp.js";
+import Profile from "../model/profile.js";
 import User from "../model/user.js";
 import bcrypt from "bcrypt";
 
@@ -44,12 +45,46 @@ const signup=async(req,res)=>{
         }
 
         const hashedPassword=await bcrypt.hash(password,10);
-        
+
+        const profileDetails=await Profile.create({
+            gender:null,
+            dateOfBirth:null,
+            about:null,
+            contactNumber:null
+        })
+
+        let approved="";
+        approved==="Instructor"?(approved=false):(approved=true);
+
+        const userData=await User.create({
+            firstName,
+            lastName,
+            email,
+            password:hashedPassword,
+            contactNumber,
+            accountType:accountType,
+            approved:approved,
+            additionalDetails:profileDetails._id,
+            image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
+        })
+
+        res.status(200).json({
+            success: true,
+            message: 'User Registered Successfully'
+        });
+
 
 
 
         
    } catch (error) {
+    console.log('Error while registering user (signup)');
+        console.log(error)
+        res.status(401).json({
+            success: false,
+            error: error.message,
+            messgae: 'User cannot be registered , Please try again..!'
+        })
     
    }
     
