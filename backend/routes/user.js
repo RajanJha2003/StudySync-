@@ -1,11 +1,11 @@
 import express from 'express';
-import {signup} from '../controllers/user.js';
+import {sendOTP, signup} from '../controllers/user.js';
 
 const userRouter=express.Router();
 
 
 userRouter.post("/signup",signup);
 
-
+userRouter.post("/sendotp",sendOTP)
 
 export default userRouter;
