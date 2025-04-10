@@ -1,3 +1,6 @@
+import OTP from "../model/otp.js";
+import User from "../model/user.js";
+import bcrypt from "bcrypt";
 
 
 const signup=async(req,res)=>{
@@ -17,6 +20,33 @@ const signup=async(req,res)=>{
                 message:"Password and confirm password did not match , please try again"
             })
         }
+
+        const existingUser=await User.findOne({email});
+        if(existingUser){
+            return res.status(400).json({
+                success:false,
+                message:"User registered already, please login"
+            })
+        }
+
+        const recentOTP=await OTP.findOne({email}).sort({createdAt:-1}).limit(1);
+
+        if(!recentOTP || recentOTP.length==0){
+            return res.status(400).json({
+                success:false,
+                message:"OTP not found in DB,please try again"
+            })
+        }else if(otp!=recentOTP.otp){
+            return res.status(400).json({
+                success:false,
+                message:"Invalid otp"
+            })
+        }
+
+        const hashedPassword=await bcrypt.hash(password,10);
+        
+
+
 
         
    } catch (error) {
