@@ -86,4 +86,6 @@ const otpTemplate = (otp, name) => {
 	
 	</html>`;
 };
-module.exports = otpTemplate;
+
+
+export default otpTemplate;

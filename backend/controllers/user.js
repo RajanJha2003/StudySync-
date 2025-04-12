@@ -4,6 +4,7 @@ import Profile from "../model/profile.js";
 import User from "../model/user.js";
 import bcrypt from "bcrypt";
 import otpGenerator from "otp-generator";
+import mailSender from "../utils/mailSender.js";
 
 const sendOTP = async (req, res) => {
   try {

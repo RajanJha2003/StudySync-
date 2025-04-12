@@ -2,7 +2,14 @@ import React, { useState } from "react";
 import { ACCOUNT_TYPE } from "../../../utils/constants";
 import Tab from "../../common/Tab";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai"
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { setSignUpData } from "../../../slices/authSlice";
+import { sendOTP } from "../../../services/operations/authAPI";
 const SignupForm = () => {
+  const navigate=useNavigate();
+  const dispatch=useDispatch();
   const [accountType, setAccountType] = useState(ACCOUNT_TYPE.STUDENT);
 
   const [formData, setFormData] = useState({
@@ -39,11 +46,43 @@ const SignupForm = () => {
       type: ACCOUNT_TYPE.INSTRUCTOR,
     },
   ];
+
+  const handleSubmit=(e)=>{
+    e.preventDefault();
+    if(password!==confirmPassword){
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    const signupData={
+      ...formData,
+      accountType
+    }
+
+
+    dispatch(setSignUpData(signupData));
+    dispatch(sendOTP(formData.email,navigate));
+
+
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+
+    setAccountType(ACCOUNT_TYPE.STUDENT);
+
+
+
+
+  }
   return (
     <div>
       <Tab tabData={tabData} field={accountType} setField={setAccountType} />
 
-      <form className="flex w-full flex-col gap-y-4">
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-y-4">
         <div className="flex gap-x-4">
           <label>
             <p className="mb-1 text-[0.875rem] text-richblack-5 leading-[1.375rem] ">

@@ -9,7 +9,7 @@ const profileSchema=new mongoose.Schema({
         type:String
     },
     about:{
-        tyoe:string
+        type:String
     },
     contactNumber:{
         type:Number
