@@ -6,10 +6,11 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import { setSignUpData } from "../../../slices/authSlice";
-import { sendOTP } from "../../../services/operations/authAPI";
+import { signUp } from "../../../services/operations/authAPI";
+
 const SignupForm = () => {
-  const navigate=useNavigate();
-  const dispatch=useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [accountType, setAccountType] = useState(ACCOUNT_TYPE.STUDENT);
 
   const [formData, setFormData] = useState({
@@ -30,54 +31,43 @@ const SignupForm = () => {
       ...prevData,
       [e.target.name]: e.target.value,
     }));
-
-    // console.log('signup form data - ', formData);
   };
 
   const tabData = [
-    {
-      id: 1,
-      tabName: "Student",
-      type: ACCOUNT_TYPE.STUDENT,
-    },
-    {
-      id: 2,
-      tabName: "Instructor",
-      type: ACCOUNT_TYPE.INSTRUCTOR,
-    },
+    { id: 1, tabName: "Student", type: ACCOUNT_TYPE.STUDENT },
+    { id: 2, tabName: "Instructor", type: ACCOUNT_TYPE.INSTRUCTOR },
   ];
 
-  const handleSubmit=(e)=>{
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if(password!==confirmPassword){
-      toast.error('Passwords do not match');
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
-
-    const signupData={
+    const signupData = {
       ...formData,
-      accountType
-    }
-
+      accountType,
+    };
 
     dispatch(setSignUpData(signupData));
-    dispatch(sendOTP(formData.email,navigate));
 
 
+    // ✅ Call the signup API
+    dispatch(signUp(accountType, firstName, lastName, email, password, confirmPassword, navigate));
     setFormData({
       firstName: "",
       lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
-    });
-
+    })
     setAccountType(ACCOUNT_TYPE.STUDENT);
+  };
 
 
 
-
-  }
+  
   return (
     <div>
       <Tab tabData={tabData} field={accountType} setField={setAccountType} />
