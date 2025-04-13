@@ -1,6 +1,7 @@
 import Profile from "../model/profile.js";
 import User from "../model/user.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // ======================== signup Controller ========================
 const signup = async (req, res) => {
@@ -94,4 +95,57 @@ const sendOTP = async (req, res) => {
   });
 };
 
-export { signup, sendOTP };
+const login=async(req,res)=>{
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "All fields are required",
+        });
+      }
+
+      let user=await User.findOne({email}).populate("additionalDetails");
+      if(!user){
+        return res.status(401).json({
+          success:false,
+          message:"User not exists"
+        })
+      }
+
+      const isMatch=await bcrypt.compare(password,user.password);
+      if(!isMatch){
+        return res.status(401).json({
+          success:false,
+          messsage:"Password incorrect"
+        })
+      }
+
+      const payload = { email: user.email, id: user._id, accountType: user.accountType };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "24h" });
+
+      user = user.toObject();
+      user.password=undefined;
+      user.token = token;
+  
+      // Set cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      });
+  
+      return res.status(200).json({ success: true, user, token, message: "Login successful" });
+
+    } catch (error) {
+      console.log('Error while Login user');
+        console.log(error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            messgae: 'Error while Login user'
+        })
+      
+    }
+}
+
+export { signup, sendOTP,login };
